@@ -20,7 +20,7 @@ function Test({ AvitoManager, db, health, config }) {
 			"employeeId": 0,
 			"itemId": 1853257996,
 			"user_id": 654654
-	}]
+		}]
 		const resViewsContacts = [{
 			"itemId": "1853257996",
 			"stats": [
@@ -30,7 +30,7 @@ function Test({ AvitoManager, db, health, config }) {
 					"uniqFavorites": 0,
 					"uniqViews": 10
 				},
-				
+
 			],
 			"user_id": 654654
 		}]
@@ -47,7 +47,7 @@ function Test({ AvitoManager, db, health, config }) {
 			uniqViews: 10
 		}]
 
-		const result = await avitoManager.normalizeAndSaveToMongo(resCalls,resViewsContacts)
+		const result = await avitoManager.normalizeAndSaveToMongo(resCalls, resViewsContacts)
 
 		expect(result).to.be.eql(data)
 

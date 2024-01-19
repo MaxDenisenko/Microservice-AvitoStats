@@ -1,6 +1,6 @@
 import AvitoStat from "./schemas/AvitoStat.js"
 
-function ClickHouseManager({ db, config,health, ClickHouse }) {
+function ClickHouseManager({ db, config, health, ClickHouse }) {
     const self = this
 
     const clickHouse = new ClickHouse(config.horizen.clickhouse)
@@ -34,10 +34,10 @@ function ClickHouseManager({ db, config,health, ClickHouse }) {
 
     async function exportStatsToClickHouse() {
         const schema = await schemas.getModel(db(tableName))
-        const result = await exportToClickhouse()
+        await exportToClickhouse()
 
         async function exportToClickhouse() {
-            // Clean ClickHouse
+
             const chSchema = schema.toDataTypes()
             const queries = [
                 `DROP TABLE IF EXISTS ${tableName}`,
@@ -68,9 +68,9 @@ function ClickHouseManager({ db, config,health, ClickHouse }) {
 
             })
             health.info('Export to ClickHouse successfully');
-            return collectionToExport
+
         }
-        return result
+
     }
 
 }

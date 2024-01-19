@@ -5,7 +5,6 @@ function AvitoManager({ db, config, health, body, ClickHouseManager }) {
 
     self.getAvitoStats = getAvitoStats
     self.normalizeAndSaveToMongo = normalizeAndSaveToMongo
-    self.countMongoCollection = countMongoCollection
 
     async function getAvitoStats() {
         health.info('Get data Avito')
@@ -37,6 +36,7 @@ function AvitoManager({ db, config, health, body, ClickHouseManager }) {
                     }
 
                     responseCalls.result.items && responseCalls.result.items.map((item) => resCalls.push({ ...item, user_id: avito.user_id }))
+
 
                     const responseViewsContacts = await (await fetch(`https://api.avito.ru/stats/v1/accounts/${avito.user_id}/items`, {
                         method: "POST",
@@ -121,20 +121,18 @@ function AvitoManager({ db, config, health, body, ClickHouseManager }) {
                 health.info(error)
             }
             finally {
-                countMongoCollection(countArr)
-
+                countMongoCollection()
             }
+        }
+        async function countMongoCollection() {
+            if (countArr == 1) {
+                clickHouseManager.exportStatsToClickHouse()
+            }
+            countArr--
         }
         return normalaizeArray
     }
 
-    async function countMongoCollection(countArr) {
-        if (countArr == 1) {
-            clickHouseManager.exportStatsToClickHouse()
-        }
-        countArr--
 
-
-    }
 }
 export default AvitoManager

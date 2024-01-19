@@ -1,32 +1,43 @@
-export default function({localServices, config, db, health, ClickHouseManager}){
+export default function ({ localServices, config, db, health, ClickHouseManager }) {
 	return {
 		endpoint: "/api/avitoStats",
 		auth: "bypass",
 		description: "",
 		errors: {
-			400:"Invalid request"
+			400: "Invalid request"
 		},
-		
-		reqSchema: ({string, object, array, number, any}, {})=> ({
+
+		reqSchema: ({ string, object, array, number, any }, { }) => ({
 			dateFrom: string(/.{1,100}/),
 			dateTo: string(/.{1,100}/),
 			user_id: array(number(/[0-9]{1,12}/)),
 			itemId: array(number(/[0-9]{1,12}/)).optional(),
 		}),
 
-		resSchema: ({string, object, array, number, any}, {})=> ({
-			items:any()
+		resSchema: ({ string, object, array, number, any }, { }) => ({
+			items: array(object({
+				date: string(/.{1,10}/),
+				user_id: number(/[0-9]{1,12}/),
+				itemId: number(/[0-9]{1,12}/),
+				calls_answered: number(/[0-9]{1,4}/),
+				calls: number(/[0-9]{1,4}/),
+				calls_new: number(/[0-9]{1,4}/),
+				calls_newAnswered: number(/[0-9]{1,4}/),
+				uniqContacts: number(/[0-9]{1,4}/),
+				uniqFavorites: number(/[0-9]{1,4}/),
+				uniqViews: number(/[0-9]{1,4}/),
+			}))
 		}),
 
-		controller: async function({body, req, res, errors}){
-			const {dateFrom, dateTo,user_id, itemId} = body
-			if(!dateFrom || !dateTo || !user_id ) {
+		controller: async function ({ body, req, res, errors }) {
+			const { dateFrom, dateTo, user_id, itemId } = body
+			if (!dateFrom || !dateTo || !user_id) {
 				throw new Error('400')
 			}
-			const AvitoManager = new localServices.AvitoManager({config, db, health, body, ClickHouseManager})
+			const AvitoManager = new localServices.AvitoManager({ config, db, health, body, ClickHouseManager })
 			const result = await AvitoManager.getAvitoStats()
-			
-			return {items:result}
+
+			return { items: result }
 		}
 	}
 }
