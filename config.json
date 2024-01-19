@@ -12,10 +12,12 @@
         "microservices": {
             "auth_api": "https://auth_api_dev.b2b.engineering"
         },
-        "avito": {
-            "avito_user": "12321",
-            "API_KEY": "29374o23jhk4k23hgj4j32hg4v32jk4g"
-        },
+        "avito": [
+            { 
+                "user_id": 654654,
+                "userApiKey":"kjhkhjsdfk3k45jh3k4jbckKBJ"
+            }
+        ],
         "clickhouse": {
             "url": "http://194.114.129.21",
             "port": "8123",

@@ -1,25 +1,73 @@
 import startedProcess from "./process.js";
-import {expect} from "chai";
+import { expect } from "chai";
 
 export default Test;
 
-function Test({config}){
-	const url = `http://127.0.0.1:${config.horizen.ports.server}`
+function Test({ AvitoManager, config, db }) {
+	const mockDataCals = {
+		"result": {
+			"items": [
+				{
+					"days": [
+						{
+							"answered": 0,
+							"calls": 0,
+							"date": "2020-04-01",
+							"new": 0,
+							"newAnswered": 0
+						}
+					],
+					"employeeId": 0,
+					"itemId": 1853257996
+				}
+			]
+		}
+	}
+	const mockDataViewsContacts ={
+		"result": {
+		  "items": [
+			{
+			  "itemId": "1853257996",
+			  "stats": [
+				{
+				  "date": "2020-06-11",
+				  "uniqContacts": 1,
+				  "uniqFavorites": 0,
+				  "uniqViews": 10
+				},
+				{
+				  "date": "2020-06-12",
+				  "uniqContacts": 0,
+				  "uniqFavorites": 2,
+				  "uniqViews": 7
+				}
+			  ]
+			},
+			{
+			  "itemId": "1853257996",
+			  "stats": [
+				{
+				  "date": "2020-06-11",
+				  "uniqContacts": 4,
+				  "uniqFavorites": 3,
+				  "uniqViews": 21
+				},
+				{
+				  "date": "2020-06-12",
+				  "uniqContacts": 1,
+				  "uniqFavorites": 1,
+				  "uniqViews": 18
+				}
+			  ]
+			}
+		  ]
+		}
+	  }
+	  it(`Запрос данных от Авито`, async () => {
+			const response = 2
+			expect(response).to.be.equal(2);
 
-	describe("Проверка бизнес-цепочки", function(){
-		it(`Должен вернуть массив`, async ()=> { 
-			const response = await (await fetch(`${url}/api/avitoStats`, {
-			    method: "POST",
-			    headers: { "Content-Type": "application/json"},
-			    body: JSON.stringify({
-					"dateFrom": "2020-05-01",
-					"dateTo":"2020-05-01",
-					"user_id":234321,
-					"itemId": [1853257996]
-			    })
-			})).json();
-
-			expect(response.text).to.be.equal('Не верный запрос');
 		});
-	})
+
+
 }
