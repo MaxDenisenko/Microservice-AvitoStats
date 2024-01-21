@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ClickHouse } from 'clickhouse'
+
 
 export default Test;
 

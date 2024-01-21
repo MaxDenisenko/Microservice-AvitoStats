@@ -13,3 +13,5 @@ _cordova/
 .idea
 .babelrc
 front-vendor/
+services/AvitoManager/mockCals.js
+services/AvitoManager/mockViewsContacts.js

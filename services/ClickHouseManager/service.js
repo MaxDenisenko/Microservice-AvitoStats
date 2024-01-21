@@ -1,4 +1,4 @@
-import AvitoStat from "./schemas/AvitoStat.js"
+import AvitoStat from "./AvitoStat.js"
 
 function ClickHouseManager({ db, config, health, ClickHouse }) {
     const self = this
@@ -34,7 +34,7 @@ function ClickHouseManager({ db, config, health, ClickHouse }) {
 
     async function exportStatsToClickHouse() {
         const schema = await schemas.getModel(db(tableName))
-        await exportToClickhouse()
+        const rExport = exportToClickhouse()
 
         async function exportToClickhouse() {
 
@@ -56,22 +56,36 @@ function ClickHouseManager({ db, config, health, ClickHouse }) {
             const collectionToExport = await db(tableName).find().toArray();
             collectionToExport.map((item, index) => item._id = index)
 
-            collectionToExport.map(async (item) => {
+            const resultPromise = collectionToExport.map(async (item) => {
                 try {
-                    await clickHouse.insert(`
+                    const result = await clickHouse.insert(`
                 INSERT INTO ${tableName} (${Object.keys(chSchema).join(", ")}) VALUES (${Object.values(item).join(", ")})`
                     ).toPromise()
+                    return result
                 } catch (error) {
-
                     health.error(error)
                 }
 
             })
-            health.info('Export to ClickHouse successfully');
+            const resultOkMessage = 'Export to ClickHouse successfully'
+            const resultError = 'Export to ClickHouse some Error'
+            let resultObj = {}
+            await Promise.all(resultPromise).then(item => {
 
+                if (item[0].r === 1){
+                    resultObj.r = 1
+                }
+            }
+            )
+            if (resultObj.r ==  1) {
+                return resultOkMessage
+            }
+            return resultError
         }
+        return rExport
 
     }
+
 
 }
 export default ClickHouseManager
