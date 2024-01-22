@@ -1,20 +1,13 @@
-
-import { assert } from 'chai';
+import { expect } from "chai";
 import { ClickHouse } from 'clickhouse'
 
 export default Test;
 
-function Test({ ClickHouseManager, db, health, config }) {
+function Test({ClickHouseManager, db, config, health}) {
 
-	it('Проверка экспорта в CLickHouse', async () => {
-		const clickHouse = new ClickHouseManager({ db, health, config, ClickHouse })
-		try {
-			const r = await clickHouse.exportStatsToClickHouse()
-			assert.strictEqual(r, 'Export to ClickHouse successfully')
-			
-		} catch (error) {
-			console.log(error)
-		}
-
+	it('Проверка экспорта в ClickHouse!!!', async () => {
+		const clickHouse = new ClickHouseManager({db, health, config, ClickHouse})
+		const result = await clickHouse.exportStatsToClickHouse()
+		expect(result).to.be.eql('Export to ClickHouse successfully')
 	});
 }

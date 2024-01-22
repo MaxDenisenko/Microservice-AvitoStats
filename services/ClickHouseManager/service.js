@@ -1,4 +1,4 @@
-import AvitoStat from "./AvitoStat.js"
+import AvitoStat from "./AvitoStatSchemas.js"
 
 function ClickHouseManager({ db, config, health, ClickHouse }) {
     const self = this

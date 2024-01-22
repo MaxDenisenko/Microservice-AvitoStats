@@ -3,7 +3,7 @@ import { expect } from "chai";
 
 export default Test;
 
-function Test({ AvitoManager, config, db }) {
+function Test({ config, db }) {
 	const mockDataCals = {
 		"result": {
 			"items": [

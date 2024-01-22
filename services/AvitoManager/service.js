@@ -1,9 +1,6 @@
-import { mockCals } from './mockCals.js'
-import { mockViewsContacts } from './mockViewsContacts.js'
 function AvitoManager({ db, config, health, body, ClickHouseManager }) {
     const self = this
     const tableName = 'avito'
-    const clickHouseManager = ClickHouseManager
 
     self.getAvitoStats = getAvitoStats
     self.normalizeAndSaveToMongo = normalizeAndSaveToMongo
@@ -17,19 +14,19 @@ function AvitoManager({ db, config, health, body, ClickHouseManager }) {
             let resViewsContacts = []
             userDataForAvito.map(async (avito) => {
                 try {
-                    const responseCalls = mockCals
-                    // const responseCalls = await (await fetch(`https://api.avito.ru/core/v1/accounts/${avito.user_id}/calls/stats/`, {
-                    //     method: "POST",
-                    //     headers: {
-                    //         "Authorization": `Bearer ${avito.userApiKey}`,
-                    //         "Content-Type": "application/json"
-                    //     },
-                    //     body: JSON.stringify({
-                    //         "dateFrom": body.dateFrom,
-                    //         "dateTo": body.dateTo,
-                    //         "itemId": body.itemId
-                    //     })
-                    // })).json()
+
+                    const responseCalls = await (await fetch(`https://api.avito.ru/core/v1/accounts/${avito.user_id}/calls/stats/`, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${avito.userApiKey}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            "dateFrom": body.dateFrom,
+                            "dateTo": body.dateTo,
+                            "itemId": body.itemId
+                        })
+                    })).json()
                     if (responseCalls.error) {
                         return health.error(responseCalls.error.message)
                     }
@@ -39,25 +36,25 @@ function AvitoManager({ db, config, health, body, ClickHouseManager }) {
 
                     responseCalls.result.items && responseCalls.result.items.map((item) => resCalls.push({ ...item, user_id: avito.user_id }))
 
-                    const responseViewsContacts = mockViewsContacts
-                    // const responseViewsContacts = await (await fetch(`https://api.avito.ru/stats/v1/accounts/${avito.user_id}/items`, {
-                    //     method: "POST",
-                    //     headers: {
-                    //         "Authorization": `Bearer ${avito.userApiKey}`,
-                    //         "Content-Type": "application/json"
-                    //     },
-                    //     body: JSON.stringify({
-                    //         "dateFrom": body.dateFrom,
-                    //         "dateTo": body.dateTo,
-                    //         "fields": [
-                    //             "uniqContacts",
-                    //             "uniqFavorites",
-                    //             "uniqViews"
-                    //         ],
-                    //         "itemId": body.itemId,
-                    //         "periodGrouping": "day"
-                    //     })
-                    // })).json()
+
+                    const responseViewsContacts = await (await fetch(`https://api.avito.ru/stats/v1/accounts/${avito.user_id}/items`, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${avito.userApiKey}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            "dateFrom": body.dateFrom,
+                            "dateTo": body.dateTo,
+                            "fields": [
+                                "uniqContacts",
+                                "uniqFavorites",
+                                "uniqViews"
+                            ],
+                            "itemId": body.itemId,
+                            "periodGrouping": "day"
+                        })
+                    })).json()
                     if (responseViewsContacts.error) {
                         return health.error(responseViewsContacts.error.message)
                     }
@@ -128,7 +125,7 @@ function AvitoManager({ db, config, health, body, ClickHouseManager }) {
         }
         async function countMongoCollection() {
             if (countArr == 1) {
-                const r = await clickHouseManager.exportStatsToClickHouse()
+                const r = await ClickHouseManager.exportStatsToClickHouse()
                 health.info(r)
             }
             countArr--

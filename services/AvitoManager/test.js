@@ -1,12 +1,12 @@
 import { expect } from "chai";
-
+import { ClickHouse } from 'clickhouse'
 
 export default Test;
 
-function Test({ AvitoManager, db, health, config }) {
+function Test({ AvitoManager, db, health, config, ClickHouseManager }) {
 	it(`Нормализация данных`, async () => {
-
-		const avitoManager = new AvitoManager({ db, health, config })
+		const clickHouse = new ClickHouseManager({ config, db, health, ClickHouse })
+		const avitoManager = new AvitoManager({ db, health, config, clickHouse })
 		const resCalls = [{
 			"days": [
 				{
