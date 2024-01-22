@@ -4,7 +4,8 @@ export default function ({ localServices, config, db, health, clickHouse }) {
 		auth: "bypass",
 		description: "",
 		errors: {
-			400: "Invalid request"
+			400: "Invalid request",
+			500: "Error while making a request"
 		},
 
 		reqSchema: ({ string, object, array, number, any }, { }) => ({
@@ -27,6 +28,7 @@ export default function ({ localServices, config, db, health, clickHouse }) {
 				uniqFavorites: number(/[0-9]{1,4}/),
 				uniqViews: number(/[0-9]{1,4}/),
 			}))
+
 		}),
 
 		controller: async function ({ body, req, res, errors }) {
@@ -36,7 +38,7 @@ export default function ({ localServices, config, db, health, clickHouse }) {
 			}
 			const AvitoManager = new localServices.AvitoManager({ config, db, health, body, clickHouse })
 			const result = await AvitoManager.getAvitoStats()
-
+			if(result[0].status === false) throw new Error('500')
 			return { items: result }
 		}
 	}

@@ -1,3 +1,4 @@
+
 function AvitoManager({ db, config, health, body, clickHouse }) {
     const self = this
     const tableName = 'avito'
@@ -12,7 +13,7 @@ function AvitoManager({ db, config, health, body, clickHouse }) {
         if (userDataForAvito.length > 0) {
             let resCalls = []
             let resViewsContacts = []
-            userDataForAvito.map(async (avito) => {
+            const result = await Promise.all(userDataForAvito.map(async (avito) => {
                 try {
 
                     const responseCalls = await (await fetch(`https://api.avito.ru/core/v1/accounts/${avito.user_id}/calls/stats/`, {
@@ -28,14 +29,13 @@ function AvitoManager({ db, config, health, body, clickHouse }) {
                         })
                     })).json()
                     if (responseCalls.error) {
-                        return health.error(responseCalls.error.message)
+                        return responseCalls.error
                     }
                     if (responseCalls.result.status === false) {
-                        return health.error(responseCalls.result.message)
+                        return responseCalls.result
                     }
 
                     responseCalls.result.items && responseCalls.result.items.map((item) => resCalls.push({ ...item, user_id: avito.user_id }))
-
 
                     const responseViewsContacts = await (await fetch(`https://api.avito.ru/stats/v1/accounts/${avito.user_id}/items`, {
                         method: "POST",
@@ -56,19 +56,22 @@ function AvitoManager({ db, config, health, body, clickHouse }) {
                         })
                     })).json()
                     if (responseViewsContacts.error) {
-                        return health.error(responseViewsContacts.error.message)
+                        return responseViewsContacts.error
                     }
                     if (responseViewsContacts.result.status === false) {
-                        return health.error(responseViewsContacts.result.message)
+                        return responseViewsContacts.result
                     }
                     responseViewsContacts.result.items && responseViewsContacts.result.items.map(item => resViewsContacts.push({ ...item, user_id: avito.user_id }))
 
                 } catch (error) {
                     health.error(error)
                 }
-            })
-            const result = await normalizeAndSaveToMongo(resCalls, resViewsContacts)
+            }))
 
+            if (resCalls.length > 0 || resViewsContacts > 0) {
+                const resultSave = await normalizeAndSaveToMongo(resCalls, resViewsContacts)
+                return resultSave
+            }
             return result
 
         }
@@ -105,7 +108,16 @@ function AvitoManager({ db, config, health, body, clickHouse }) {
         // Определяем кол-во записей данных к загрузке
         let countArr = normalaizeArray.length
 
-        normalaizeArray.forEach(async (item) => await addRecord(item))
+        const result = await Promise.all(normalaizeArray.map(async (item) => {
+            await addRecord(item)
+            if (item._id) {
+                const no_id = ({ _id, ...rest }) => rest
+                const newItem = no_id(item)
+                return newItem
+            }
+            return item
+        }))
+
 
         async function addRecord(dataset) {
             try {
@@ -119,17 +131,18 @@ function AvitoManager({ db, config, health, body, clickHouse }) {
                 health.info(error)
             }
             finally {
-                countMongoCollection()
+                await countMongoCollection()
             }
         }
         async function countMongoCollection() {
-            if (countArr == 0) {
+            if (countArr == 1) {
                 const r = await clickHouse.exportStatsToClickHouse()
                 health.info(r)
             }
             countArr--
         }
-        return normalaizeArray
+
+        return result
     }
 
 
