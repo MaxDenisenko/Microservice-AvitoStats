@@ -1,4 +1,4 @@
-export default function ({ localServices, config, db, health, ClickHouseManager }) {
+export default function ({ localServices, config, db, health, clickHouse }) {
 	return {
 		endpoint: "/api/avitoStats",
 		auth: "bypass",
@@ -34,7 +34,7 @@ export default function ({ localServices, config, db, health, ClickHouseManager 
 			if (!dateFrom || !dateTo || !user_id) {
 				throw new Error('400')
 			}
-			const AvitoManager = new localServices.AvitoManager({ config, db, health, body, ClickHouseManager })
+			const AvitoManager = new localServices.AvitoManager({ config, db, health, body, clickHouse })
 			const result = await AvitoManager.getAvitoStats()
 
 			return { items: result }

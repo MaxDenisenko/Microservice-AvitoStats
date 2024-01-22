@@ -1,4 +1,4 @@
-function AvitoManager({ db, config, health, body, ClickHouseManager }) {
+function AvitoManager({ db, config, health, body, clickHouse }) {
     const self = this
     const tableName = 'avito'
 
@@ -105,8 +105,7 @@ function AvitoManager({ db, config, health, body, ClickHouseManager }) {
         // Определяем кол-во записей данных к загрузке
         let countArr = normalaizeArray.length
 
-
-        normalaizeArray.forEach((item) => addRecord(item))
+        normalaizeArray.forEach(async (item) => await addRecord(item))
 
         async function addRecord(dataset) {
             try {
@@ -120,12 +119,12 @@ function AvitoManager({ db, config, health, body, ClickHouseManager }) {
                 health.info(error)
             }
             finally {
-                await countMongoCollection()
+                countMongoCollection()
             }
         }
         async function countMongoCollection() {
-            if (countArr == 1) {
-                const r = await ClickHouseManager.exportStatsToClickHouse()
+            if (countArr == 0) {
+                const r = await clickHouse.exportStatsToClickHouse()
                 health.info(r)
             }
             countArr--
